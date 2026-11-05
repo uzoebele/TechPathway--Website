@@ -95,7 +95,7 @@ pipeline {
     post {
         always {
             sh 'docker rm -f smoke-am smoke-wh smoke-wc >/dev/null 2>&1 || true'
-            echo 'Pipeline finished.'
+            echo 'Pipeline finished - this build started by itself.'
         }
     }
 }
