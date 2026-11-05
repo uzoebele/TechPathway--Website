@@ -50,26 +50,27 @@ pipeline {
         }
 
         // ---------- 3. PUSH TO ECR ----------
-        // Needs an AWS credential stored in Jenkins with the id 'aws-creds'.
-        stage('Push to ECR') {
-            steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'aws-creds',
-                    usernameVariable: 'AWS_ACCESS_KEY_ID',
-                    passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                    sh '''
-                        set -e
-                        aws ecr get-login-password --region $AWS_REGION \
-                          | docker login --username AWS --password-stdin $REGISTRY
-
-                        for APP in action-messages techpathway-warehouse weekly-call; do
-                            docker tag  $APP:$BUILD_NUMBER $REGISTRY/$APP:$BUILD_NUMBER
-                            docker push $REGISTRY/$APP:$BUILD_NUMBER
-                        done
-                    '''
-                }
-            }
-        }
+        // Switched off until the 'aws-creds' credential exists in Jenkins.
+        // Turn back on by deleting the leading // on each line below.
+        // stage('Push to ECR') {
+        //     steps {
+        //         withCredentials([usernamePassword(
+        //             credentialsId: 'aws-creds',
+        //             usernameVariable: 'AWS_ACCESS_KEY_ID',
+        //             passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+        //             sh '''
+        //                 set -e
+        //                 aws ecr get-login-password --region $AWS_REGION \
+        //                   | docker login --username AWS --password-stdin $REGISTRY
+        //
+        //                 for APP in action-messages techpathway-warehouse weekly-call; do
+        //                     docker tag  $APP:$BUILD_NUMBER $REGISTRY/$APP:$BUILD_NUMBER
+        //                     docker push $REGISTRY/$APP:$BUILD_NUMBER
+        //                 done
+        //             '''
+        //         }
+        //     }
+        // }
 
         // ---------- 4. DEPLOY TO EKS ----------
         // Switched off until the cluster exists.
