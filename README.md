@@ -62,3 +62,4 @@ At the end of testing:
 
 ## Security
 Sensitive credentials are not committed to source control. The repository contains secret-example.yaml as a template only.
+its a crazy learning process
