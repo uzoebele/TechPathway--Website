@@ -49,6 +49,30 @@ pipeline {
             }
         }
 
+        // ---------- 2.5 SECURITY SCAN (Snyk) ----------
+        // Scan each built image against Snyk's vulnerability database.
+        // REPORT MODE: the '|| true' at the end of each scan lets the build
+        // PASS even if vulns are found - so we can SEE the results first.
+        // To turn this into a hard GATE that BLOCKS a vulnerable build,
+        // delete the '|| true' on each scan line. That's the whole switch.
+        stage('Security scan') {
+            steps {
+                withCredentials([string(credentialsId: 'snyk', variable: 'SNYK_TOKEN')]) {
+                    sh '''
+                        set -e
+                        # Grab the Snyk CLI (standalone binary, nothing to install).
+                        curl -s https://downloads.snyk.io/cli/stable/snyk-linux -o snyk
+                        chmod +x snyk
+
+                        # --severity-threshold=high = only care about High + Critical.
+                        ./snyk container test action-messages:$BUILD_NUMBER       --severity-threshold=high || true
+                        ./snyk container test techpathway-warehouse:$BUILD_NUMBER --severity-threshold=high || true
+                        ./snyk container test weekly-call:$BUILD_NUMBER           --severity-threshold=high || true
+                    '''
+                }
+            }
+        }
+
         // ---------- 3. PUSH TO ECR ----------
         // Switched off until the 'aws-creds' credential exists in Jenkins.
         // Turn back on by deleting the leading // on each line below.
